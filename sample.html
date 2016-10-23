@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="./reset.css">
+	<link rel="stylesheet" href="./nin-lib.css">
+	<title>lib</title>
+	<style type="text/css">
+		#content1 {
+			background-color: yellow;
+			width: 50%;
+			height: 500px;
+		}
+		.active-title {
+			background-color: black;
+			color: white;
+			border-radius: 10px;
+		}
+		.inactive-title {
+			background-color: blue;
+			color: orange;
+			border-radius: 10px;
+		}
+		
+		.item {
+			background-color: green;
+			border: solid;
+			box-sizing: border-box;
+		}
+	</style>
+	<script type="text/javascript" src="nin-lib.js"></script>
+
+	<nin-item-slide style="width: 60%; height: 10rem;">
+		<nin-item-list id="testlist">
+			<nin-slide-item class="item" style="background-color: #400" onclick="alert('a');"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #800"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #c00"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #f00"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #f40"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #f80"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #Fc0"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #ff0"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #0f0"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #0f8"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #0fc"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #0ff"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #00f"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #40f"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #80f"></nin-slide-item>
+			<nin-slide-item class="item" style="background-color: #c0f"></nin-slide-item>
+		</nin-item-list>
+	</nin-item-slide>
+
+
+
+<hr>
+	
+
+	<nin-dropdown>
+	<!-- start with 'active' and 'inactive' class is needed for styling 'nin-title'-->
+		<nin-title-list class="active-title inactive-title">
+			<nin-title>a</nin-title>
+			<nin-title>b</nin-title>
+			<nin-title>c</nin-title>
+			<nin-title>d</nin-title>
+			<nin-title>e</nin-title>
+		</nin-title-list>
+		<nin-content-list>
+			<nin-content style="background-color: red;">aaaa</nin-content>
+			<nin-content style="background-color: blue;">bbbb</nin-content>
+			<nin-content style="background-color: green;">cccc</nin-content>
+			<nin-content style="background-color: orange;">dddd</nin-content>
+			<nin-content style="background-color: gray;">eeee</nin-content>
+		</nin-content-list>
+	</nin-dropdown>
+
+
+<hr>
+
+
+	<nin-slider style="height: 20rem;">
+		<div style="background-color: red;"></div>
+		<div style="background-color: blue;"></div>
+		<div style="background-color: green;"></div>
+	</nin-slider>
+	
+<hr>
+
+	<button onclick="ninModal.show('content1', 'center')">Modal</button>
+	<nin-modal id="content1">
+		<button onclick="ninModal.close()">close</button>
+	</nin-modal>
+
+
+<hr>

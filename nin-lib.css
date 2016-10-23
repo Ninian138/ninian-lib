@@ -1,0 +1,135 @@
+html {
+	-moz-user-select: none;
+	user-select: none;
+}
+nin-arrow {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-basis: 5%;
+	z-index: 99;
+	background-color: blue;
+}
+
+/*item slide*/
+nin-click-field {
+	display: block;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(255,0,0,.4);
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+nin-item-slide {
+	position: relative;
+	display: flex;
+	width: 500px;
+	height: 200px;
+	margin: 0 auto;
+	overflow: hidden;
+}
+nin-item-list {
+	display: flex;
+	flex-basis: 90%;
+	height: 100%;
+}
+nin-slide-item {
+	flex-basis: 33.3333333333%;
+	flex-shrink: 0;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+/*	Modal	*/
+nin-modal-field {
+	background-color: rgba(0,0,0,.7);
+	position: fixed;
+	display: block;
+	top: 0;
+	left: 0;
+	width: 500px;
+	height: 500px;
+	z-index: 999;
+}
+nin-modal {
+	display: none;
+}
+
+/*	Slider	*/
+nin-slider{
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	overflow: hidden;
+}
+nin-slider div{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+nin-slider-arrow {
+	height: 100%;
+	cursor: pointer;
+	background-color: rgba(0,0,0,.1);
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 5%;
+	z-index: 99;
+	background-color: blue;
+}
+nin-slider-arrow:hover, nin-slider-arrow:hover {
+	background-color: rgba(0,0,0,.3);
+}
+nin-slider-linkf {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	top: 86%;
+	width: 90%;
+	height: 10%;
+	margin: 0 auto;
+}
+nin-slider-link {
+	height: 100%;
+	margin: 0 0.5%;
+	border-radius: 50%;
+	cursor: pointer;
+	background-color: white;
+	border: solid 1px black;
+	box-sizing: border-box;
+}
+
+
+/*	Dropdown	*/
+nin-dropdown {
+	display: block;
+}
+nin-title-list {
+	display: flex;
+	justify-content: space-between;
+}
+nin-title-list nin-title {
+	box-sizing: border-box;
+	flex: 1;
+	text-align: center;
+}
+nin-content-list {
+	position: relative;
+	display: block;
+	height: 200px;
+	overflow: hidden;
+}
+nin-content-list nin-content {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
