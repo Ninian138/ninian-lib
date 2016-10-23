@@ -1,4 +1,3 @@
-"use strict"
 //global
 var ninScreenWidth;
 var ninScreenHeight;
@@ -76,7 +75,7 @@ class NinItemSlide {
 	}
 	inertia() {
 		this.translateVal += this.velocity;
-		if(this.velocity != 0) this.velocity = this.velocity*0.92;
+		if(this.velocity != 0) this.velocity = this.velocity*0.93;
 		this.move();
 
 		if(Math.abs(this.velocity)>0.01) setTimeout(this.inertia.bind(this), 20);
@@ -85,11 +84,13 @@ class NinItemSlide {
 		if(this.clicking == true) {
 			ev.preventDefault();
 			let pageX = this.getPageX(ev);
-			this.movedtimeBefore = this.movedtime;
-			this.movedtime = ev.timeStamp;
-			this.translateVal -= this.clickPoint - pageX;
-			this.clickPointBefore = this.clickPoint;
-			this.clickPoint = pageX;
+			if(this.movedtime != ev.timeStamp) {
+				this.movedtimeBefore = this.movedtime;
+				this.movedtime = ev.timeStamp;
+				this.clickPointBefore = this.clickPoint;
+				this.clickPoint = pageX;
+			}
+			this.translateVal -= this.clickPointBefore - pageX;	
 			this.move();
 		}
 	}
@@ -104,20 +105,10 @@ class NinItemSlide {
 	onMouseup(ev) {
 		this.clicking = false;
 		let pageX = this.getPageX(ev);
-		console.log(this.movedtime - this.movedtimeBefore);
-		console.log(this.movedtime - this.movedtimeBefore);
-		console.log(this.movedtime - this.movedtimeBefore);
-		if(ninBrowser == "firefox") {
-			if(this.movedtime - this.movedtimeBefore != 0) {
-				this.velocity = (this.clickPoint - this.clickPointBefore)/(this.movedtime - this.movedtimeBefore)*20;
-				console.log(this.clickPoint - this.clickPointBefore);
-			} else this.velocity = 0;
-		} else {
-			if(ev.timeStamp - this.movedtime < 80 && this.movedtime - this.movedtimeBefore != 0) {
-				this.velocity = (this.clickPoint - this.clickPointBefore)/(this.movedtime - this.movedtimeBefore)*20;
-			} else this.velocity = 0;
-		}
-		
+		if(ev.timeStamp - this.movedtime < 200 && this.movedtime - this.movedtimeBefore != 0) {
+			this.velocity = (this.clickPoint - this.clickPointBefore)/(this.movedtime - this.movedtimeBefore)*20;
+		} else this.velocity = 0;
+		console.log(this.velocity);
 		this.inertia();
 	}
 	onMouseleave(ev) {
@@ -146,7 +137,7 @@ class NinItemSlide {
 		this.translateQuantity = 0 - this.moveVal;
 
 		this.moveTo();
-	}
+	}			
 	getPageX(ev) {
 		let pageX;
 		pageX = (ev.pageX)? ev.pageX : ev.changedTouches[0].pageX;
@@ -162,7 +153,7 @@ class NinItemSlide {
 function ninDropdownStart() {
 	var ninDropdownList = document.getElementsByTagName('nin-dropdown');
 	for (var i = 0; i < ninDropdownList.length; i++) {
-		new NinDropdown(ninDropdownList[i]);
+		ninDropdownList[i] = new NinDropdown(ninDropdownList[i]);
 	}
 }
 class NinDropdown {
@@ -282,7 +273,7 @@ function ninMordalStart() {
 	ninModal = new NinModalController();
 }
 function ninMordalOnResize() {
-	ninModal.onResize(ninScreenWidth,ninScreenHeight);
+	ninModal.changeScreenSize(ninScreenWidth,ninScreenHeight);
 }
 
 
@@ -320,7 +311,7 @@ class NinModalController {
 		this.modalField.style.display = "none";
 		this.scale = 0;
 	}
-	onResize(width, height) {
+	changeScreenSize(width, height) {
 		this.modalField.style.width = width + "px";
 		this.modalField.style.height = height + "px";
 		if (this.modalField != null) {
@@ -342,32 +333,32 @@ class NinSlider {
 	constructor(el) {
 		this.el = el;
 		this.contents = [];
-		this.linkEl = [];
+		this.linkEl - [];
 
 		for (var i = 0; i < this.el.children.length; i++) {
 			this.contents[i] = this.el.children[i];
 			this.contents[i].style.display = "none";
+			this.contents[i].style.transition = "all 3s";
+
 		}
 		let leftarrow = document.createElement('nin-slider-arrow');
-		let rightarrow = document.createElement('nin-slider-arrow');
 		leftarrow.style.left = 0;
+		let rightarrow = document.createElement('nin-slider-arrow');
 		rightarrow.style.right = 0;
-		leftarrow.innerHTML = "<<";
 		rightarrow.innerHTML = ">>";
-		leftarrow.onclick = this.arrowClicked.bind(this, 0);
-		rightarrow.onclick = this.arrowClicked.bind(this, 1);
+		leftarrow.innerHTML = "<<";
 		this.el.appendChild(rightarrow);
 		this.el.appendChild(leftarrow);
 		this.linkField = document.createElement('nin-slider-linkf');
 		this.el.appendChild(this.linkField);
 		for (var i = 0; i < this.contents.length; i++) {	
-			let newlinkElement = document.createElement('nin-slider-link');
-			newlinkElement.onclick = this.linkClicked.bind(this, i);
-			this.linkField.appendChild(newlinkElement);
-			this.linkEl[i] = newlinkElement;
+			let linkEl = document.createElement('nin-slider-link');
+			linkEl.onclick = this.linkClicked.bind(this, i);
+			this.linkField.appendChild(linkEl);
+			linkEl[i] = linkEl;
 
 			//need onresize
-			newlinkElement.style.width = newlinkElement.offsetHeight + "px";
+			linkEl.style.height = linkEl.offsetWidth + "px";
 		}
 		this.contents[0].style.display = "block"
 		
@@ -377,79 +368,188 @@ class NinSlider {
 		this.length = this.contents.length;
 		this.direction;
 		this.from;
-		this.moving = false;
+		this.flag = true;
+		this.auto = true;
 		this.link = [];
 		this.timer;
-		this.nextAction;
 		
 
-		this.spd = 4;
+		this.spd = 1;
 
 
 		//this.setTimer();
 		this.changeColor(0);
 	}
 	linkClicked(num) {
-		if(!this.moving) {
-			this.getDirection(num);
-			this.moveTo(num);
-			this.changeColor(num);
-		} else {
-			this.nextAction = num;
-		}
-	}
-	arrowClicked(num) {
-		let dir = (num == 0)? this.active -1 : this.active +1;
-		dir = (dir < 0)? this.length-1 : dir;
-		dir = (dir >= this.length)? 0 : dir;
-		this.linkClicked(dir)
+		this.getDirection(num);
+		this.moveTo(num);
 	}
 	moveTo(num) {
 		this.from = this.active;
 		this.active = num;
+		this.contents[this.active].style.transfrom = "translateX(100%)";
+		this.contents[this.from].style.transform = "translateX(100%)";
 		this.contents[this.active].style.display = "block";
-		if(this.direction != "same") {
-			this.contents[this.active].style.transform = (this.direction == "left")? "translateX(100%)" : "translateX(-100%)";
-			this.moving = true;
-			this.slide();
-		}
-	}
-	slide() {
-		this.translateVal += this.spd;
-		if(this.direction == "right") {
-			this.contents[this.from].style.transform = "translateX(" + ( 0 - this.translateVal) + "%)";
-			this.contents[this.active].style.transform = "translateX(" + (100 - this.translateVal) + "%)";
-		} else {
-			this.contents[this.from].style.transform = "translateX(" + this.translateVal + "%)";
-			this.contents[this.active].style.transform = "translateX(" + (this.translateVal - 100) + "%)";
-		}
-		
-		if(this.translateVal > 99) {
-			this.contents[this.from].style.display = "none";
-			this.translateVal = 0;
-			this.moving = false;
-			if(this.nextAction != null) {
-				this.linkClicked(this.nextAction);
-				this.nextAction = null;
-			}
-		} else setTimeout(this.slide.bind(this), 20);
-		
+		this.contents[this.active].style.transfrom = "translateX(5%)";
+
 	}
 	getDirection(num) {
-		if(num == this.active) this.direction = "same";
+		if(num == this.active) this.direction ="same";
 		else {
 			let a = (this.active - num < 1)? this.active + this.contents.length - num : this.active - num;
  			let b = (num - this.active < 1)? num + this.contents.length - this.active : num - this.active;
- 			this.direction = (a >=b )? "left" : "right";
+ 			this.direction = (a >= b)? "left" : "right";
  		}
 	}
-	changeColor() {
-		for (var i = 0; i < this.linkEl.length; i++) {
-			this.linkEl[i].className = (i == this.active)? "nin-active-slider-link" : "nin-inactive-slider-link" 
-		}
-	}
+	changeColor() {}
 }
+// //Slider
+// var NinSlider = function(element) {
+// 	this.flag = true; 
+// 	this.el = element;
+// 	this.content = [];
+// 	this.vec;
+// 	this.from;
+// 	this.to;
+// 	this.auto = true;
+// 	this.link = [];
+// 	if(this.auto == true)this.timer = setInterval(this.next.bind(this), 4000);
+// 	for (var i = 0; i < this.el.children.length; i++) {
+// 		this.content[i] = this.el.children[i];
+// 		this.content[i].style.left = "0%";
+// 	}
+// 	this.tab = 0;
+// 	var right = document.createElement('div');
+// 	right.style.width = "5%";
+// 	right.classList.add('ninRightAr');
+// 	var left = document.createElement('div');
+// 	left.style.width = "5%";
+// 	left.classList.add('ninLeftAr');
+// 	right.innerHTML = ">>";
+// 	left.innerHTML = "<<";
+// 	this.el.appendChild(right);
+// 	this.el.appendChild(left);
+// 	for (var i = this.content.length - 1; i >= 1; i--) {
+// 		this.content[i].style.display = "none";
+// 	}
+// 	//○○
+// 	var linkDiv = document.createElement('aside');
+// 	linkDiv.classList.add('ninLinkDiv');
+// 	this.el.appendChild(linkDiv);
+// 	for (var i = 0; i < this.content.length; i++) {
+// 		let el = document.createElement('p');
+// 		el.classList.add('ninLinkDivEl');
+// 		linkDiv.appendChild(el);
+// 		this.link[i] = new NinSliderLink(i, this,el);
+// 	}
+// 	this.link[0].changeColor("#00f");
+// }
+// var NinSliderLink = function(num, el, child) {
+// 	this.parent = el;
+// 	this.num = num;
+// 	this.el = child;
+// 	this.el.addEventListener('click', this.event.bind(this), false);
+// 	this.el.addEventListener('touch', this.event.bind(this), false);
+// }
+// NinSliderLink.prototype = {
+// 	event: function() {
+// 		this.act();
+// 	},
+// 	act: function() {
+// 		this.parent.change(this.num);
+// 	},
+// 	changeColor: function(val) {
+// 		this.el.style.backgroundColor = val;
+// 	}
+// }
 
+
+
+// NinSlider.prototype = {
+// 	next: function() {
+// 		if(this.flag == true) {
+// 			this.flag = false;
+// 			this.vec = 0;
+// 			this.from = this.tab;
+// 			if(this.content.length>this.tab+1) {
+// 				this.tab++;	
+// 			} else {
+// 				this.tab = 0;
+// 			}
+// 			this.content[this.tab].style.left = "100%";
+// 			this.content[this.tab].style.display = "block";
+// 			this.to = this.tab;
+// 			if(this.auto == true)clearInterval(this.timer);
+
+// 			this.slide();
+			
+// 		}
+// 	},
+// 	prev: function() {
+// 		if(this.flag == true) {
+// 			this.flag = false;
+// 			this.vec = 1;
+// 			this.from = this.tab;
+// 			if(this.tab>0) {
+// 				this.tab--;	
+// 			} else {
+// 				this.tab = this.content.length-1;
+// 			}
+// 			this.content[this.tab].style.left = "-100%";
+// 			this.content[this.tab].style.display = "block";
+// 			this.to = this.tab;
+// 			if(this.auto == true)clearInterval(this.timer);
+// 			this.slide();
+// 		}
+// 	},
+// 	slide: function() {
+// 		let fromEl = this.content[this.from];
+// 		let toEl = this.content[this.to];
+// 		this.link[this.from].changeColor("#fff");
+// 		this.link[this.to].changeColor("#00f");
+// 		if(this.vec == 0) {
+// 			fromEl.style.left = parseInt(fromEl.style.left)-5+"%";
+// 			toEl.style.left = parseInt(toEl.style.left)-5+"%";
+// 			if(parseInt(fromEl.style.left) > -99) {
+// 				setTimeout(this.slide.bind(this),20);
+// 			} else {
+// 				fromEl.style.left = "-100%";
+// 				toEl.style.left = "0%";
+// 				this.flag = true;
+// 				if(this.auto == true) this.timer = setInterval(this.next.bind(this), 4000);
+// 			}
+// 		} else {
+// 			fromEl.style.left = parseInt(fromEl.style.left)+5+"%";
+// 			toEl.style.left = parseInt(toEl.style.left)+5+"%";
+// 			if(parseInt(fromEl.style.left) < 99) {
+// 				setTimeout(this.slide.bind(this),20);
+// 			} else {
+// 				fromEl.style.left = "100%";
+// 				toEl.style.left = "0%";
+// 				this.flag = true;
+// 				if(this.auto == true) this.timer = setInterval(this.next.bind(this), 4000);
+// 			}
+// 		}
+// 	},
+// 	change: function(el) {
+// 		if (this.flag&&el != this.tab) {
+// 			let a = (this.tab-el < 1)? this.tab+this.content.length-el : this.tab-el;
+// 			let b = (el-this.tab < 1)? el+this.content.length-this.tab : el-this.tab;
+// 			this.vec = (a >=b )? 0 : 1;
+// 			this.content[el].style.left = (this.vec == 0)? "100%" : "-100%";
+// 			this.content[el].style.display = "block";
+// 			this.flag = false;
+// 			this.from =this.tab;
+// 			this.to = el;
+// 			this.tab = el;
+			
+			
+// 			if(this.auto == true) clearInterval(this.timer);
+// 			this.slide();
+// 		}
+// 	}
+
+// }
 
 function ninSliderStart() {
 
@@ -457,6 +557,12 @@ function ninSliderStart() {
 	var ninSliderElement = document.getElementsByTagName('nin-slider');
 	for (var i = 0;ninSliderElement.length > i; i++) {
 		ninSliderArray[i] = new NinSlider(ninSliderElement[i]);
+
+		// let tmp = ninSliderArray[i];
+		// document.getElementsByClassName('ninRightAr')[i].addEventListener('click', function(){tmp.next();}, false);
+		// document.getElementsByClassName('ninLeftAr')[i].addEventListener('click', function(){tmp.prev();}, false);
+		// document.getElementsByClassName('ninRightAr')[i].addEventListener('touch', function(){tmp.next();}, false);
+		// document.getElementsByClassName('ninLeftAr')[i].addEventListener('touch', function(){tmp.prev();}, false);
 	}
 }
 
